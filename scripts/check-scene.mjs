@@ -1,0 +1,6 @@
+import assert from 'node:assert/strict';
+import { buildCampus,canWalk } from '../src/campus-model.js';
+import {toWorld} from '../src/campus-data.js';
+import {readFile} from 'node:fs/promises';
+const {root,buildings,colliders}=buildCampus();assert.equal(new Set(buildings.map(b=>b.id)).size,buildings.length);for(const b of buildings){assert.ok(b.width>0&&b.height>0&&b.depth>0);assert.ok(Math.abs(b.x)<250&&Math.abs(b.z)<375);assert.ok(colliders.some(c=>c.building===b.id));}
+assert.ok(canWalk(...toWorld(183,1114),colliders),'west gate spawn is free');assert.ok(!canWalk(900,0,colliders),'world bounds block escape');const b=buildings.find(b=>b.id==='library');assert.ok(!canWalk(b.x,b.z,colliders),'library blocks walking');const one=buildings.find(b=>b.id==='teaching1');assert.ok(canWalk(one.x+30,one.z-one.depth*.35,colliders),'U-shaped building courtyard stays open');let vertices=0;root.traverse(o=>{if(o.isMesh){const p=o.geometry.attributes.position;vertices+=p.count;for(let i=0;i<p.array.length;i++)assert.ok(Number.isFinite(p.array[i]));}});const glb=await readFile('public/models/bupt-haidian.glb');assert.equal(glb.toString('utf8',0,4),'glTF');assert.equal(glb.readUInt32LE(8),glb.length);console.log(`OK: ${buildings.length} buildings, ${colliders.length} colliders, ${vertices} vertices; GLB header and length verified.`);

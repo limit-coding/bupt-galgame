@@ -1,0 +1,23 @@
+{
+  "name": "bupt-haidian-campus",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "export": "node scripts/export-model.mjs",
+    "check": "node scripts/check-scene.mjs && node scripts/check-seasons.mjs && node scripts/check-exploration.mjs && node scripts/check-world.mjs",
+    "check:browser": "node scripts/smoke.mjs && node scripts/smoke-seasons.mjs && node scripts/smoke-exploration.mjs",
+    "preview": "node scripts/serve.mjs --open",
+    "release": "npm run export && npm run check && npm run build && node scripts/package-release.mjs",
+    "check:world": "node scripts/smoke-world.mjs"
+  },
+  "dependencies": {
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "vite": "^7.1.7",
+    "@playwright/test": "^1.55.1"
+  }
+}

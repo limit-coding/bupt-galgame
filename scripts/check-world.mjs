@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import * as THREE from 'three';
+import {createCreative,sanitizeProps} from '../src/creative.js';
+import {moveWithCollisions} from '../src/navigation.js';
+const scene=new THREE.Scene(),data=new Map(),storage={getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)};
+const wall={minX:0,maxX:.1,minZ:-10,maxZ:10};
+const build=createCreative(scene,storage,[wall]);
+assert.equal(build.add({type:'block',x:0,z:0,rotation:0}),false,'thin wall intersecting prop center must block placement');
+assert.equal(build.add({type:'block',x:8,z:0,rotation:0}),true);
+assert.equal(build.add({type:'bench',x:8,z:0,rotation:Math.PI/2}),false,'overlap rejected');
+assert.equal(build.count,1);assert.equal(createCreative(new THREE.Scene(),storage,[wall]).count,1,'reload restores props');
+const moved=moveWithCollisions({x:4,z:0},8,0,build.colliders);assert.ok(moved.x<6.5,'personal props block walking');
+assert.equal(build.remove(0),true);assert.equal(build.count,0);assert.equal(build.undo(),true);assert.equal(build.count,1);assert.equal(build.undo(),true);assert.equal(build.count,0);
+assert.deepEqual(sanitizeProps([{type:'tree',x:NaN,z:0,rotation:0},{type:'script',x:0,z:0,rotation:0},null]),[]);
+assert.equal(sanitizeProps(Array.from({length:200},()=>({type:'tree',x:8,z:0,rotation:0}))).length,160);
+const denied=createCreative(new THREE.Scene(),{getItem(){throw Error('denied');},setItem(){throw Error('denied');}},[]);assert.equal(denied.persistent,false);assert.ok(denied.add({type:'tree',x:12,z:12,rotation:0}));assert.equal(denied.count,1);
+console.log('World checks passed: prop overlap/thin-wall rejection, collision, persistence, undo, invalid storage and count limits.');

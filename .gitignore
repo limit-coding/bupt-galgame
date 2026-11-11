@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.DS_Store
+release/
+artifacts/
+
+# Separate RenPy project and its generated distributions
+/BUPT-Galgame/
+/renpy-releases/
+
+# Local credentials, logs and editor state
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.log
+.vscode/
+.idea/
